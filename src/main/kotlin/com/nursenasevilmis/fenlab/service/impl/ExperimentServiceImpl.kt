@@ -106,13 +106,15 @@ class ExperimentServiceImpl(
 
     @Transactional
     override fun createExperiment(request: ExperimentCreateRequestDTO): ExperimentResponseDTO {
-        val currentUserId = SecurityUtils.getCurrentUserId()
+        // TEST MODE: Geçici olarak user id 1 kullan
+        val currentUserId = 2L // SecurityUtils.getCurrentUserId()
+
         val user = userRepository.findById(currentUserId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı") }
 
-        if (!SecurityUtils.isTeacher()) {
-            throw ForbiddenException("Sadece öğretmenler deney oluşturabilir")
-        }
+       // if (!SecurityUtils.isTeacher()) {
+          //  throw ForbiddenException("Sadece öğretmenler deney oluşturabilir")
+      //  }
 
         // Experiment oluştur
         val experiment = Experiment(
@@ -169,10 +171,11 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-        val currentUserId = SecurityUtils.getCurrentUserId()
-        if (experiment.user.id != currentUserId) {
-            throw ForbiddenException("Sadece kendi deneyinizi güncelleyebilirsiniz")
-        }
+       // val currentUserId = SecurityUtils.getCurrentUserId()
+        val currentUserId = 2L
+       // if (experiment.user.id != currentUserId) {
+            //throw ForbiddenException("Sadece kendi deneyinizi güncelleyebilirsiniz")
+        //}
 
         // Experiment güncelle
         val updatedExperiment = experiment.copy(
@@ -237,10 +240,11 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-        val currentUserId = SecurityUtils.getCurrentUserId()
-        if (experiment.user.id != currentUserId) {
-            throw ForbiddenException("Sadece kendi deneyinizi silebilirsiniz")
-        }
+        //val currentUserId = SecurityUtils.getCurrentUserId()
+        val currentUserId = 2L
+        //if (experiment.user.id != currentUserId) {
+          //  throw ForbiddenException("Sadece kendi deneyinizi silebilirsiniz")
+        //}
 
         // Soft delete
         val deletedExperiment = experiment.copy(isDeleted = true)

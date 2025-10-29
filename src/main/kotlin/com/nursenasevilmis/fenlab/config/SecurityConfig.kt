@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -35,26 +36,23 @@ class SecurityConfig(
             .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/experiments/public/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/experiments/**").permitAll()
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                    .requestMatchers("/api/experiments/create", "/api/experiments/*/update").hasAuthority("TEACHER")
-                    .anyRequest().authenticated()
+                    // ⭐ TEST MODE: TÜM ENDPOINT'LER AÇIK ⭐
+                    .anyRequest().permitAll()
             }
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+        // JWT Filter'ı devre dışı bırakmak için yorum satırına alındı
+        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+
         return http.build()
     }
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000", "http://localhost:8081")
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedOrigins = listOf("http://localhost:3000", "http://localhost:8081", "*")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
         configuration.allowedHeaders = listOf("*")
-        configuration.allowCredentials = true
+        configuration.allowCredentials = false // Test için false yapıldı
         configuration.maxAge = 3600L
 
         val source = UrlBasedCorsConfigurationSource()

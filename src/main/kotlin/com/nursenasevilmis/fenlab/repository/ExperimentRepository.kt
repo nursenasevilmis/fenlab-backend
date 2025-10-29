@@ -34,8 +34,9 @@ interface ExperimentRepository : JpaRepository<Experiment, Long> {
         AND (:subject IS NULL OR e.subject = :subject)
         AND (:gradeLevel IS NULL OR e.gradeLevel = :gradeLevel)
         AND (:difficulty IS NULL OR e.difficulty = :difficulty)
-        AND (:search IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')) 
-             OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')))
+        AND (CAST(:search AS string) IS NULL 
+             OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) 
+             OR LOWER(e.description) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
     """)
     fun findByFilters(
         @Param("subject") subject: String?,
