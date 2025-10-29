@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -36,26 +35,16 @@ class SecurityConfig(
             .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }
             .authorizeHttpRequests { auth ->
                 auth
-                    // Public endpoints
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/experiments/public/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/experiments/**").permitAll()
-
-                    // Swagger/OpenAPI
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-
-                    // Actuator
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-
-                    // Teacher only endpoints
                     .requestMatchers("/api/experiments/create", "/api/experiments/*/update").hasAuthority("TEACHER")
-
-                    // Authenticated endpoints
                     .anyRequest().authenticated()
             }
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
         return http.build()
     }
 
@@ -74,12 +63,9 @@ class SecurityConfig(
     }
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager {
-        return config.authenticationManager
-    }
+    fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
+        config.authenticationManager
 }
