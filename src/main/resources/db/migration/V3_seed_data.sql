@@ -5,11 +5,11 @@
 -- Hash: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
 
 -- Test kullanıcıları ekle
-INSERT INTO users (id,username, full_name, email, password, role, branch, experience_years, bio, is_public, created_at) VALUES
-(1,'ahmet_ogretmen', 'Ahmet Yılmaz', 'ahmet.ogretmen@fenlab.com', 'pass123', 'TEACHER', 'Fizik', 10, 'Fizik öğretmeniyim. Deneyleri seviyorum.', true, CURRENT_TIMESTAMP),
-(2,'ayse_ogretmen', 'Ayşe Demir', 'ayse.ogretmen@fenlab.com', 'ayse1234', 'TEACHER', 'Kimya', 8, 'Kimya öğretmeniyim.', true, CURRENT_TIMESTAMP),
-(3,'mehmet_ogrenci', 'Mehmet Kaya', 'mehmet.ogrenci@fenlab.com', 'mehmet4545', 'USER', NULL, NULL, 'Fen bilimlerine meraklı bir öğrenciyim.', true, CURRENT_TIMESTAMP),
-(4,'zeynep_ogrenci', 'Zeynep Şahin', 'zeynep.ogrenci@fenlab.com', 'zeynep7878', 'USER', NULL, NULL, NULL, true, CURRENT_TIMESTAMP);
+INSERT INTO users (id,username, full_name, email, password, role, branch, experience_years, bio, created_at) VALUES
+(1,'ahmet_ogretmen', 'Ahmet Yılmaz', 'ahmet.ogretmen@fenlab.com', 'pass123', 'TEACHER', 'Fizik', 10, 'Fizik öğretmeniyim. Deneyleri seviyorum.',  CURRENT_TIMESTAMP),
+(2,'ayse_ogretmen', 'Ayşe Demir', 'ayse.ogretmen@fenlab.com', 'ayse1234', 'TEACHER', 'Kimya', 8, 'Kimya öğretmeniyim.',  CURRENT_TIMESTAMP),
+(3,'mehmet_ogrenci', 'Mehmet Kaya', 'mehmet.ogrenci@fenlab.com', 'mehmet4545', 'USER', NULL, NULL, 'Fen bilimlerine meraklı bir öğrenciyim.',  CURRENT_TIMESTAMP),
+(4,'zeynep_ogrenci', 'Zeynep Şahin', 'zeynep.ogrenci@fenlab.com', 'zeynep7878', 'USER', NULL, NULL, NULL, CURRENT_TIMESTAMP);
 
 -- Test deneyleri ekle
 INSERT INTO experiments (id,user_id, title, description, grade_level, subject, difficulty, expected_result, safety_notes, is_published, created_at) VALUES

@@ -20,7 +20,6 @@ CREATE TABLE users (
     experience_years INT CHECK (experience_years >= 0),
     bio TEXT,
     profile_image_url TEXT,
-    is_public BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP
