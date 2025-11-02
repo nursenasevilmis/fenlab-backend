@@ -1,6 +1,8 @@
 package com.nursenasevilmis.fenlab.model
 
 import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
+import com.nursenasevilmis.fenlab.model.enums.EnvironmentType
+import com.nursenasevilmis.fenlab.model.enums.SubjectType
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -24,8 +26,17 @@ data class Experiment(
     @Column(name = "grade_level", nullable = false)
     val gradeLevel: Int,
 
-    @Column(nullable = false, length = 100)
-    val subject: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subject", nullable = true)
+    val subject: SubjectType? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "environment", nullable = true)
+    val environment: EnvironmentType? = null,
+
+    @Column(name = "topic", length = 255)
+    val topic: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
