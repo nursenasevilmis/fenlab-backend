@@ -1,6 +1,8 @@
 package com.nursenasevilmis.fenlab.dto.response
 
 import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
+import com.nursenasevilmis.fenlab.model.enums.EnvironmentType
+import com.nursenasevilmis.fenlab.model.enums.SubjectType
 import java.time.LocalDateTime
 //Deney detay sayfasında gösterilen verinin tamamı.
 data class ExperimentResponseDTO(
@@ -9,7 +11,9 @@ data class ExperimentResponseDTO(
     val title: String,
     val description: String,
     val gradeLevel: Int,
-    val subject: String,
+    val subject: SubjectType?,
+    val environment: EnvironmentType?,
+    val topic: String?,
     val difficulty: DifficultyLevel,
     val expectedResult: String?,
     val safetyNotes: String?,

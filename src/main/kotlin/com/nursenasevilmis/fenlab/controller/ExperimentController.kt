@@ -6,6 +6,7 @@ import com.nursenasevilmis.fenlab.dto.request.ExperimentUpdateRequestDTO
 import com.nursenasevilmis.fenlab.dto.response.ExperimentResponseDTO
 import com.nursenasevilmis.fenlab.dto.response.ExperimentSummaryResponseDTO
 import com.nursenasevilmis.fenlab.dto.response.PaginatedResponseDTO
+import com.nursenasevilmis.fenlab.model.enums.*
 import com.nursenasevilmis.fenlab.service.ExperimentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -13,12 +14,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -49,10 +48,13 @@ class ExperimentController(
         @Parameter(description = "Ders alanı filtresi")
         @RequestParam(required = false) subject: String?,
 
+        @Parameter(description = "Ortam tipi filtresi (LABORATORY, HOME, SCHOOL)")
+        @RequestParam(required = false) environment: String?,
+
         @Parameter(description = "Sınıf seviyesi filtresi")
         @RequestParam(required = false) gradeLevel: Int?,
 
-        @Parameter(description = "Zorluk seviyesi filtresi")
+        @Parameter(description = "Zorluk seviyesi filtresi (EASY, MEDIUM, HARD)")
         @RequestParam(required = false) difficulty: String?,
 
         @Parameter(description = "Sıralama türü (MOST_RECENT, OLDEST, HIGHEST_RATED, MOST_FAVORITED)")
@@ -64,12 +66,14 @@ class ExperimentController(
         @Parameter(description = "Sayfa boyutu")
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<PaginatedResponseDTO<ExperimentSummaryResponseDTO>> {
+
         val filterRequest = ExperimentFilterRequestDTO(
             search = search,
-            subject = subject,
+            subject = runCatching { subject?.let { SubjectType.valueOf(it.uppercase()) } }.getOrNull(),
+            environment = runCatching { environment?.let { EnvironmentType.valueOf(it.uppercase()) } }.getOrNull(),
             gradeLevel = gradeLevel,
-            difficulty = difficulty?.let { com.nursenasevilmis.fenlab.model.enums.DifficultyLevel.valueOf(it) },
-            sortType = com.nursenasevilmis.fenlab.model.enums.SortType.valueOf(sortType),
+            difficulty = runCatching { difficulty?.let { DifficultyLevel.valueOf(it.uppercase()) } }.getOrNull(),
+            sortType = runCatching { SortType.valueOf(sortType.uppercase()) }.getOrDefault(SortType.MOST_RECENT),
             page = page,
             size = size
         )

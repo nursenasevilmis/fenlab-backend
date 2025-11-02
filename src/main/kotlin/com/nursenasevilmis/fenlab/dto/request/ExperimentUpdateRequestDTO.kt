@@ -1,11 +1,11 @@
 package com.nursenasevilmis.fenlab.dto.request
 
 import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
+import com.nursenasevilmis.fenlab.model.enums.SubjectType
+import com.nursenasevilmis.fenlab.model.enums.EnvironmentType
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.Size
-//Var olan bir deneyi düzenlemek için kullanılır.
+import jakarta.validation.constraints.*
+
 data class ExperimentUpdateRequestDTO(
     @field:Size(max = 255)
     val title: String? = null,
@@ -16,8 +16,9 @@ data class ExperimentUpdateRequestDTO(
     @field:Max(12)
     val gradeLevel: Int? = null,
 
-    @field:Size(max = 100)
-    val subject: String? = null,
+    val subject: SubjectType? = null,
+    val environment: EnvironmentType? = null,
+    val topic: String? = null,
 
     val difficulty: DifficultyLevel? = null,
     val expectedResult: String? = null,

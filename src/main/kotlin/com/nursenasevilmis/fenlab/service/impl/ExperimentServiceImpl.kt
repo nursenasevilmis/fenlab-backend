@@ -1,34 +1,20 @@
 package com.nursenasevilmis.fenlab.service.impl
 
-
-import com.nursenasevilmis.fenlab.dto.request.ExperimentCreateRequestDTO
-import com.nursenasevilmis.fenlab.dto.request.ExperimentFilterRequestDTO
-import com.nursenasevilmis.fenlab.dto.request.ExperimentUpdateRequestDTO
-import com.nursenasevilmis.fenlab.dto.response.ExperimentResponseDTO
-import com.nursenasevilmis.fenlab.dto.response.ExperimentSummaryResponseDTO
-import com.nursenasevilmis.fenlab.dto.response.PaginatedResponseDTO
-import com.nursenasevilmis.fenlab.dto.response.MediaResponseDTO
-import com.nursenasevilmis.fenlab.dto.response.MaterialResponseDTO
-import com.nursenasevilmis.fenlab.dto.response.StepResponseDTO
+import com.nursenasevilmis.fenlab.dto.request.*
+import com.nursenasevilmis.fenlab.dto.response.*
 import com.nursenasevilmis.fenlab.exception.ForbiddenException
 import com.nursenasevilmis.fenlab.exception.ResourceNotFoundException
 import com.nursenasevilmis.fenlab.mapper.ExperimentMapper
-import com.nursenasevilmis.fenlab.model.Experiment
-import com.nursenasevilmis.fenlab.model.ExperimentMaterial
-import com.nursenasevilmis.fenlab.model.ExperimentStep
-import com.nursenasevilmis.fenlab.model.ExperimentMedia
-import com.nursenasevilmis.fenlab.model.enums.MediaType
-import com.nursenasevilmis.fenlab.model.enums.SortType
+import com.nursenasevilmis.fenlab.model.*
+import com.nursenasevilmis.fenlab.model.enums.*
 import com.nursenasevilmis.fenlab.repository.*
 import com.nursenasevilmis.fenlab.service.ExperimentService
-import com.nursenasevilmis.fenlab.service.UserService
 import com.nursenasevilmis.fenlab.util.PaginationUtils
 import com.nursenasevilmis.fenlab.util.SecurityUtils
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-
 
 @Service
 class ExperimentServiceImpl(
@@ -44,14 +30,14 @@ class ExperimentServiceImpl(
         val sort = when (filterRequest.sortType) {
             SortType.MOST_RECENT -> Sort.by(Sort.Direction.DESC, "createdAt")
             SortType.OLDEST -> Sort.by(Sort.Direction.ASC, "createdAt")
-            SortType.HIGHEST_RATED -> Sort.by(Sort.Direction.DESC, "createdAt")
-            SortType.MOST_FAVORITED -> Sort.by(Sort.Direction.DESC, "createdAt")
+            SortType.HIGHEST_RATED, SortType.MOST_FAVORITED -> Sort.by(Sort.Direction.DESC, "createdAt")
         }
 
         val pageable = PaginationUtils.createPageable(filterRequest.page, filterRequest.size, sort)
 
         val page = experimentRepository.findByFilters(
             subject = filterRequest.subject,
+            environment = filterRequest.environment,
             gradeLevel = filterRequest.gradeLevel,
             difficulty = filterRequest.difficulty,
             search = filterRequest.search,
@@ -106,23 +92,18 @@ class ExperimentServiceImpl(
 
     @Transactional
     override fun createExperiment(request: ExperimentCreateRequestDTO): ExperimentResponseDTO {
-        // TEST MODE: Geçici olarak user id 1 kullan
         val currentUserId = 2L // SecurityUtils.getCurrentUserId()
-
         val user = userRepository.findById(currentUserId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı") }
 
-       // if (!SecurityUtils.isTeacher()) {
-          //  throw ForbiddenException("Sadece öğretmenler deney oluşturabilir")
-      //  }
-
-        // Experiment oluştur
         val experiment = Experiment(
             user = user,
             title = request.title,
             description = request.description,
             gradeLevel = request.gradeLevel,
             subject = request.subject,
+            environment = request.environment,
+            topic = request.topic,
             difficulty = request.difficulty,
             expectedResult = request.expectedResult,
             safetyNotes = request.safetyNotes,
@@ -132,35 +113,38 @@ class ExperimentServiceImpl(
 
         val savedExperiment = experimentRepository.save(experiment)
 
-        // Materials ekle
+        // Materials
         request.materials.forEach { materialReq ->
-            val material = ExperimentMaterial(
-                experiment = savedExperiment,
-                materialName = materialReq.materialName,
-                quantity = materialReq.quantity
+            experimentMaterialRepository.save(
+                ExperimentMaterial(
+                    experiment = savedExperiment,
+                    materialName = materialReq.materialName,
+                    quantity = materialReq.quantity
+                )
             )
-            experimentMaterialRepository.save(material)
         }
 
-        // Steps ekle
+        // Steps
         request.steps.forEach { stepReq ->
-            val step = ExperimentStep(
-                experiment = savedExperiment,
-                stepOrder = stepReq.stepOrder,
-                stepText = stepReq.stepText
+            experimentStepRepository.save(
+                ExperimentStep(
+                    experiment = savedExperiment,
+                    stepOrder = stepReq.stepOrder,
+                    stepText = stepReq.stepText
+                )
             )
-            experimentStepRepository.save(step)
         }
 
-        // Media ekle
+        // Media
         request.media.forEach { mediaReq ->
-            val media = ExperimentMedia(
-                experiment = savedExperiment,
-                mediaType = mediaReq.mediaType,
-                mediaUrl = mediaReq.mediaUrl,
-                mediaOrder = mediaReq.mediaOrder
+            experimentMediaRepository.save(
+                ExperimentMedia(
+                    experiment = savedExperiment,
+                    mediaType = mediaReq.mediaType,
+                    mediaUrl = mediaReq.mediaUrl,
+                    mediaOrder = mediaReq.mediaOrder
+                )
             )
-            experimentMediaRepository.save(media)
         }
 
         return getExperimentById(savedExperiment.id!!)
@@ -171,18 +155,15 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-       // val currentUserId = SecurityUtils.getCurrentUserId()
-        val currentUserId = 2L
-       // if (experiment.user.id != currentUserId) {
-            //throw ForbiddenException("Sadece kendi deneyinizi güncelleyebilirsiniz")
-        //}
+        val currentUserId = 2L // SecurityUtils.getCurrentUserId()
 
-        // Experiment güncelle
         val updatedExperiment = experiment.copy(
             title = request.title ?: experiment.title,
             description = request.description ?: experiment.description,
             gradeLevel = request.gradeLevel ?: experiment.gradeLevel,
             subject = request.subject ?: experiment.subject,
+            environment = request.environment ?: experiment.environment,
+            topic = request.topic ?: experiment.topic,
             difficulty = request.difficulty ?: experiment.difficulty,
             expectedResult = request.expectedResult ?: experiment.expectedResult,
             safetyNotes = request.safetyNotes ?: experiment.safetyNotes,
@@ -192,43 +173,43 @@ class ExperimentServiceImpl(
 
         experimentRepository.save(updatedExperiment)
 
-        // Materials güncelle
-        request.materials?.let { materials ->
+        request.materials?.let {
             experimentMaterialRepository.deleteByExperimentId(experimentId)
-            materials.forEach { materialReq ->
-                val material = ExperimentMaterial(
-                    experiment = updatedExperiment,
-                    materialName = materialReq.materialName,
-                    quantity = materialReq.quantity
+            it.forEach { req ->
+                experimentMaterialRepository.save(
+                    ExperimentMaterial(
+                        experiment = updatedExperiment,
+                        materialName = req.materialName,
+                        quantity = req.quantity
+                    )
                 )
-                experimentMaterialRepository.save(material)
             }
         }
 
-        // Steps güncelle
-        request.steps?.let { steps ->
+        request.steps?.let {
             experimentStepRepository.deleteByExperimentId(experimentId)
-            steps.forEach { stepReq ->
-                val step = ExperimentStep(
-                    experiment = updatedExperiment,
-                    stepOrder = stepReq.stepOrder,
-                    stepText = stepReq.stepText
+            it.forEach { req ->
+                experimentStepRepository.save(
+                    ExperimentStep(
+                        experiment = updatedExperiment,
+                        stepOrder = req.stepOrder,
+                        stepText = req.stepText
+                    )
                 )
-                experimentStepRepository.save(step)
             }
         }
 
-        // Media güncelle
-        request.media?.let { mediaList ->
+        request.media?.let {
             experimentMediaRepository.deleteByExperimentId(experimentId)
-            mediaList.forEach { mediaReq ->
-                val media = ExperimentMedia(
-                    experiment = updatedExperiment,
-                    mediaType = mediaReq.mediaType,
-                    mediaUrl = mediaReq.mediaUrl,
-                    mediaOrder = mediaReq.mediaOrder
+            it.forEach { req ->
+                experimentMediaRepository.save(
+                    ExperimentMedia(
+                        experiment = updatedExperiment,
+                        mediaType = req.mediaType,
+                        mediaUrl = req.mediaUrl,
+                        mediaOrder = req.mediaOrder
+                    )
                 )
-                experimentMediaRepository.save(media)
             }
         }
 
@@ -240,13 +221,7 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-        //val currentUserId = SecurityUtils.getCurrentUserId()
         val currentUserId = 2L
-        //if (experiment.user.id != currentUserId) {
-          //  throw ForbiddenException("Sadece kendi deneyinizi silebilirsiniz")
-        //}
-
-        // Soft delete
         val deletedExperiment = experiment.copy(isDeleted = true)
         experimentRepository.save(deletedExperiment)
     }
@@ -277,7 +252,7 @@ class ExperimentServiceImpl(
     }
 
     override fun getAllSubjects(): List<String> {
-        return experimentRepository.findAllSubjects()
+        return experimentRepository.findAllSubjects().map { it.name }
     }
 
     override fun mapToExperimentSummary(experiment: Experiment, currentUserId: Long?): ExperimentSummaryResponseDTO {

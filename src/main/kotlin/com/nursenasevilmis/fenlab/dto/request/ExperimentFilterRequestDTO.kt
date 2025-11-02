@@ -1,11 +1,11 @@
 package com.nursenasevilmis.fenlab.dto.request
 
-import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
-import com.nursenasevilmis.fenlab.model.enums.SortType
-//Deneyleri filtreleme/listeleme için kullanılır:
+import com.nursenasevilmis.fenlab.model.enums.*
+
 data class ExperimentFilterRequestDTO(
     val search: String? = null,
-    val subject: String? = null,
+    val subject: SubjectType? = null,
+    val environment: EnvironmentType? = null,
     val gradeLevel: Int? = null,
     val difficulty: DifficultyLevel? = null,
     val sortType: SortType = SortType.MOST_RECENT,

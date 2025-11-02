@@ -1,31 +1,29 @@
 package com.nursenasevilmis.fenlab.dto.request
 
 import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
+import com.nursenasevilmis.fenlab.model.enums.SubjectType
+import com.nursenasevilmis.fenlab.model.enums.EnvironmentType
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
-import jakarta.validation.constraints.NotNull
-//Yeni bir deney oluşturma formunun tamamını taşır.
+import jakarta.validation.constraints.*
+
 data class ExperimentCreateRequestDTO(
-    @field:NotBlank(message = "Başlık boş olamaz")
+    @field:NotBlank
     @field:Size(max = 255)
     val title: String,
 
-    @field:NotBlank(message = "Açıklama boş olamaz")
+    @field:NotBlank
     val description: String,
 
-    @field:NotNull(message = "Sınıf seviyesi belirtilmelidir")
-    @field:Min(value = 1, message = "Sınıf seviyesi en az 1 olmalıdır")
-    @field:Max(value = 12, message = "Sınıf seviyesi en fazla 12 olabilir")
+    @field:NotNull
+    @field:Min(1)
+    @field:Max(12)
     val gradeLevel: Int,
 
-    @field:NotBlank(message = "Ders alanı boş olamaz")
-    @field:Size(max = 100)
-    val subject: String,
+    val subject: SubjectType? = null,
+    val environment: EnvironmentType? = null,
+    val topic: String? = null,
 
-    @field:NotNull(message = "Zorluk seviyesi belirtilmelidir")
+    @field:NotNull
     val difficulty: DifficultyLevel,
 
     val expectedResult: String? = null,

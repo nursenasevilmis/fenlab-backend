@@ -1,6 +1,8 @@
 package com.nursenasevilmis.fenlab.dto.response
 
 import com.nursenasevilmis.fenlab.model.enums.DifficultyLevel
+import com.nursenasevilmis.fenlab.model.enums.EnvironmentType
+import com.nursenasevilmis.fenlab.model.enums.SubjectType
 import java.time.LocalDateTime
 //Kart görünümündeki “deney kutucukları” bu veriden oluşturulur.
 data class ExperimentSummaryResponseDTO(
@@ -9,7 +11,9 @@ data class ExperimentSummaryResponseDTO(
     val title: String,
     val description: String,
     val gradeLevel: Int,
-    val subject: String,
+    val subject: SubjectType?,
+    val environment: EnvironmentType?,
+    val topic: String?,
     val difficulty: DifficultyLevel,
     val createdAt: LocalDateTime,
 

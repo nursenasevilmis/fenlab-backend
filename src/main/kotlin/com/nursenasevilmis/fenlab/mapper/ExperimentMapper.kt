@@ -9,7 +9,6 @@ import com.nursenasevilmis.fenlab.model.enums.MediaType
 import com.nursenasevilmis.fenlab.repository.*
 import org.springframework.stereotype.Component
 
-
 @Component
 class ExperimentMapper(
     private val userMapper: UserMapper,
@@ -47,6 +46,8 @@ class ExperimentMapper(
             description = experiment.description,
             gradeLevel = experiment.gradeLevel,
             subject = experiment.subject,
+            environment = experiment.environment,
+            topic = experiment.topic,
             difficulty = experiment.difficulty,
             expectedResult = experiment.expectedResult,
             safetyNotes = experiment.safetyNotes,
@@ -74,7 +75,7 @@ class ExperimentMapper(
             favoriteRepository.existsByUserIdAndExperimentId(it, experiment.id!!)
         } ?: false
 
-        // İlk video/image'i thumbnail olarak kullan
+        // İlk video veya image'i thumbnail olarak kullan
         val media = experimentMediaRepository.findByExperimentIdOrderByMediaOrderAsc(experiment.id!!)
         val firstVideo = media.firstOrNull { it.mediaType == MediaType.VIDEO }
         val firstImage = media.firstOrNull { it.mediaType == MediaType.IMAGE }
@@ -86,6 +87,8 @@ class ExperimentMapper(
             description = experiment.description,
             gradeLevel = experiment.gradeLevel,
             subject = experiment.subject,
+            environment = experiment.environment,
+            topic = experiment.topic,
             difficulty = experiment.difficulty,
             createdAt = experiment.createdAt,
             thumbnailUrl = firstImage?.mediaUrl,
@@ -97,28 +100,25 @@ class ExperimentMapper(
         )
     }
 
-    fun toMaterialResponse(material: ExperimentMaterial): MaterialResponseDTO {
-        return MaterialResponseDTO(
+    fun toMaterialResponse(material: ExperimentMaterial): MaterialResponseDTO =
+        MaterialResponseDTO(
             id = material.id!!,
             materialName = material.materialName,
             quantity = material.quantity
         )
-    }
 
-    fun toStepResponse(step: ExperimentStep): StepResponseDTO {
-        return StepResponseDTO(
+    fun toStepResponse(step: ExperimentStep): StepResponseDTO =
+        StepResponseDTO(
             id = step.id!!,
             stepOrder = step.stepOrder,
             stepText = step.stepText
         )
-    }
 
-    fun toMediaResponse(media: ExperimentMedia): MediaResponseDTO {
-        return MediaResponseDTO(
+    fun toMediaResponse(media: ExperimentMedia): MediaResponseDTO =
+        MediaResponseDTO(
             id = media.id!!,
             mediaType = media.mediaType,
             mediaUrl = media.mediaUrl,
             mediaOrder = media.mediaOrder
         )
-    }
 }
