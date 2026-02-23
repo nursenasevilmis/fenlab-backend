@@ -19,9 +19,7 @@ class RatingController(
     private val ratingService: RatingService
 ) {
 
-    // ==============================
-    // 1️⃣ Deneyi puanlama (oluştur veya güncelle)
-    // ==============================
+
     @PostMapping("/experiment/{experimentId}")
     @Operation(summary = "Bir deneyi puanlar veya mevcut puanı günceller")
     fun rateExperiment(
@@ -32,9 +30,7 @@ class RatingController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
-    // ==============================
-    // 2️⃣ Kullanıcının kendi puanını getir
-    // ==============================
+
     @GetMapping("/experiment/{experimentId}/me")
     @Operation(summary = "Geçerli kullanıcının bu deney için verdiği puanı getirir")
     fun getUserRating(
@@ -44,9 +40,7 @@ class RatingController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 3️⃣ Deneyin ortalama puanını getir
-    // ==============================
+
     @GetMapping("/experiment/{experimentId}/average")
     @Operation(summary = "Deneyin ortalama puanını getirir")
     fun getAverageRating(

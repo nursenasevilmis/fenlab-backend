@@ -16,7 +16,6 @@ class NotificationController(
     private val notificationService: NotificationService
 ) {
 
-    // ✅ Tüm bildirimleri getir
     @Operation(summary = "Kullanıcının tüm bildirimlerini getir")
     @GetMapping
     fun getUserNotifications(
@@ -27,7 +26,6 @@ class NotificationController(
         return ResponseEntity.ok(notifications)
     }
 
-    // ✅ Okunmamış bildirimleri getir
     @Operation(summary = "Kullanıcının okunmamış bildirimlerini getir")
     @GetMapping("/unread")
     fun getUnreadNotifications(
@@ -38,7 +36,6 @@ class NotificationController(
         return ResponseEntity.ok(unreadNotifications)
     }
 
-    // ✅ Tek bir bildirimi okundu olarak işaretle
     @Operation(summary = "Belirli bir bildirimi okundu olarak işaretle")
     @PatchMapping("/{notificationId}/read")
     fun markAsRead(
@@ -48,7 +45,6 @@ class NotificationController(
         return ResponseEntity.ok(mapOf("message" to "Bildirim okundu olarak işaretlendi."))
     }
 
-    // ✅ Tüm bildirimleri okundu olarak işaretle
     @Operation(summary = "Tüm bildirimleri okundu olarak işaretle")
     @PatchMapping("/read-all")
     fun markAllAsRead(): ResponseEntity<Map<String, String>> {
@@ -56,7 +52,6 @@ class NotificationController(
         return ResponseEntity.ok(mapOf("message" to "Tüm bildirimler okundu olarak işaretlendi."))
     }
 
-    // ✅ Okunmamış bildirim sayısını getir
     @Operation(summary = "Okunmamış bildirim sayısını getir")
     @GetMapping("/unread/count")
     fun getUnreadCount(): ResponseEntity<Map<String, Long>> {

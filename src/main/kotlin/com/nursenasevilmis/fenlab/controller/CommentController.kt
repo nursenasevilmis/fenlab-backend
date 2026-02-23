@@ -26,11 +26,7 @@ class CommentController(
         return ResponseEntity.ok(comments)
     }
 
-    // ⭐ TEST MODE: Bu endpoint'i geçici devre dışı bırakın
-    // @GetMapping("/my-experiments/{experimentId}")
-    // fun getMyExperimentComments(...) { ... }
-
-    @PostMapping("/experiment/{experimentId}")
+      @PostMapping("/experiment/{experimentId}")
     fun addComment(
         @PathVariable experimentId: Long,
         @Valid @RequestBody request: CommentCreateRequestDTO

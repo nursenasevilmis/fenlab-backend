@@ -17,9 +17,6 @@ class AuthController(
     private val authService: AuthService
 ) {
 
-    // ==============================
-    // 1️⃣ Kullanıcı kayıt işlemi
-    // ==============================
     @PostMapping("/register")
     @Operation(summary = "Yeni kullanıcı kaydı oluşturur")
     fun register(
@@ -29,9 +26,7 @@ class AuthController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
-    // ==============================
-    // 2️⃣ Kullanıcı giriş işlemi
-    // ==============================
+
     @PostMapping("/login")
     @Operation(summary = "Kullanıcı girişi yapar ve JWT token döner")
     fun login(

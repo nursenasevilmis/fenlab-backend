@@ -19,9 +19,7 @@ class QuestionController(
     private val questionService: QuestionService
 ) {
 
-    // ==============================
-    // 1️⃣ Belirli bir deneyin tüm sorularını listele
-    // ==============================
+
     @GetMapping("/experiment/{experimentId}")
     @Operation(summary = "Belirli bir deneyin sorularını getirir")
     fun getQuestionsByExperiment(
@@ -33,9 +31,7 @@ class QuestionController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 2️⃣ Soru sorma (öğrenci tarafından)
-    // ==============================
+
     @PostMapping("/experiment/{experimentId}")
     @Operation(summary = "Bir deneye yeni soru ekler (öğrenciler için)")
     fun askQuestion(
@@ -46,9 +42,6 @@ class QuestionController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
-    // ==============================
-    // 3️⃣ Soruyu cevaplama (deney sahibi öğretmen tarafından)
-    // ==============================
     @PostMapping("/{questionId}/answer")
     @Operation(summary = "Bir soruya cevap ekler (deney sahibi tarafından)")
     fun answerQuestion(
@@ -59,9 +52,7 @@ class QuestionController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 4️⃣ Soruyu silme (soru sahibi veya deney sahibi)
-    // ==============================
+
     @DeleteMapping("/{questionId}")
     @Operation(summary = "Bir soruyu siler (soru sahibi veya deney sahibi tarafından)")
     fun deleteQuestion(
@@ -71,9 +62,6 @@ class QuestionController(
         return ResponseEntity.noContent().build()
     }
 
-    // ==============================
-    // 5️⃣ Cevaplanmamış soruları getir (öğretmen paneli için)
-    // ==============================
     @GetMapping("/unanswered")
     @Operation(summary = "Kullanıcının deneylerindeki cevaplanmamış soruları getirir")
     fun getUnansweredQuestions(

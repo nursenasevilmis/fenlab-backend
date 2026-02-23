@@ -16,9 +16,7 @@ class FileUploadController(
     private val fileUploadService: FileUploadService
 ) {
 
-    // ================================================
-    // 📸 IMAGE UPLOAD
-    // ================================================
+
     @Operation(summary = "Görsel yükle", description = "Bir görsel dosyasını yükler ve URL döner")
     @PostMapping("/upload/image")
     fun uploadImage(@RequestParam("file") file: MultipartFile): ResponseEntity<FileUploadResponseDTO> {
@@ -26,9 +24,7 @@ class FileUploadController(
         return ResponseEntity.ok(response)
     }
 
-    // ================================================
-    // 🎥 VIDEO UPLOAD
-    // ================================================
+
     @Operation(summary = "Video yükle", description = "Bir video dosyasını yükler ve URL döner")
     @PostMapping("/upload/video")
     fun uploadVideo(@RequestParam("file") file: MultipartFile): ResponseEntity<FileUploadResponseDTO> {
@@ -36,9 +32,7 @@ class FileUploadController(
         return ResponseEntity.ok(response)
     }
 
-    // ================================================
-    // 👤 PROFILE IMAGE UPLOAD
-    // ================================================
+
     @Operation(summary = "Profil fotoğrafı yükle", description = "Kullanıcının profil fotoğrafını yükler ve URL döner")
     @PostMapping("/upload/profile")
     fun uploadProfileImage(@RequestParam("file") file: MultipartFile): ResponseEntity<FileUploadResponseDTO> {
@@ -46,9 +40,7 @@ class FileUploadController(
         return ResponseEntity.ok(response)
     }
 
-    // ================================================
-    // ❌ DELETE IMAGE
-    // ================================================
+
     @Operation(summary = "Görsel sil", description = "Belirtilen URL'deki görseli siler")
     @DeleteMapping("/delete/image")
     fun deleteImage(@RequestParam("url") imageUrl: String): ResponseEntity<Void> {
@@ -56,9 +48,6 @@ class FileUploadController(
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
 
-    // ================================================
-    // ❌ DELETE VIDEO
-    // ================================================
     @Operation(summary = "Video sil", description = "Belirtilen URL'deki videoyu siler")
     @DeleteMapping("/delete/video")
     fun deleteVideo(@RequestParam("url") videoUrl: String): ResponseEntity<Void> {

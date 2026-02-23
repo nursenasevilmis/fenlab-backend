@@ -18,9 +18,6 @@ class UserController(
     private val userService: UserService
 ) {
 
-    // ==============================
-    // 1️⃣ Mevcut kullanıcı bilgilerini getir
-    // ==============================
     @GetMapping("/me")
     @Operation(summary = "Giriş yapmış kullanıcının bilgilerini getirir")
     fun getCurrentUser(): ResponseEntity<UserResponseDTO> {
@@ -28,9 +25,7 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 2️⃣ Belirli bir kullanıcıyı getir
-    // ==============================
+
     @GetMapping("/{userId}")
     @Operation(summary = "Kullanıcı ID'sine göre kullanıcı bilgilerini getirir")
     fun getUserById(
@@ -40,9 +35,6 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 3️⃣ Kullanıcı bilgilerini güncelle
-    // ==============================
     @PutMapping("/{userId}")
     @Operation(summary = "Giriş yapmış kullanıcı kendi profil bilgilerini günceller")
     fun updateUser(
@@ -53,9 +45,7 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
-    // ==============================
-    // 4️⃣ Kullanıcıyı sil (soft delete)
-    // ==============================
+
     @DeleteMapping("/{userId}")
     @Operation(summary = "Kullanıcı kendi hesabını siler (soft delete)")
     fun deleteUser(
