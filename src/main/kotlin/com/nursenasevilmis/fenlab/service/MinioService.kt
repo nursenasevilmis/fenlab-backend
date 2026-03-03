@@ -15,7 +15,7 @@ class MinioService(
     private val minioProperties: MinioProperties
 ) {
 
-
+    @PostConstruct
     private fun createBucketsIfNotExists() {
         val buckets = listOf(
             minioProperties.buckets.videos,
@@ -144,8 +144,17 @@ class MinioService(
     /**
      * Dosya URL'i alma
      */
+    /*
     fun getFileUrl(bucketName: String, fileName: String): String {
         return "${minioProperties.url}/$bucketName/$fileName"
+    }
+*/
+
+    fun getFileUrl(bucketName: String, fileName: String): String {
+        val androidUrl = minioProperties.url
+            .replace("localhost", "10.0.3.2")
+            .replace("127.0.0.1", "10.0.3.2")
+        return "$androidUrl/$bucketName/$fileName"
     }
 
     /**
