@@ -1,7 +1,7 @@
 
 -- ENUM YAPILARI
 CREATE TYPE user_role AS ENUM ('TEACHER', 'USER');
-CREATE TYPE difficulty_level AS ENUM ('KOLAY', 'ORTA', 'ZOR');
+CREATE TYPE difficulty_level AS ENUM ('EASY', 'MEDIUM', 'HARD');
 CREATE TYPE notification_type AS ENUM ('COMMENT', 'QUESTION', 'ANSWER', 'FAVORITE');
 CREATE TYPE media_type AS ENUM ('IMAGE', 'VIDEO');
 CREATE TYPE sort_type AS ENUM ('MOST_RECENT', 'MOST_FAVORITED', 'HIGHEST_RATED', 'OLDEST');
@@ -33,6 +33,8 @@ CREATE TABLE experiments (
     description TEXT NOT NULL,
     grade_level INT NOT NULL CHECK (grade_level >= 1 AND grade_level <= 12),
     subject VARCHAR(100) NOT NULL,
+    environment VARCHAR(50),
+    topic VARCHAR(255),
     difficulty difficulty_level NOT NULL,
     expected_result TEXT,
     safety_notes TEXT,
