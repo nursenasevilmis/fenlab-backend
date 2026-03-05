@@ -36,12 +36,13 @@ class ExperimentServiceImpl(
         val pageable = PaginationUtils.createPageable(filterRequest.page, filterRequest.size, sort)
 
         val page = experimentRepository.findByFilters(
-            subject = filterRequest.subject,
-            environment = filterRequest.environment,
-            gradeLevel = filterRequest.gradeLevel,
-            difficulty = filterRequest.difficulty,
-            search = filterRequest.search,
-            pageable = pageable
+            subject       = filterRequest.subject,
+            environment   = filterRequest.environment,
+            minGradeLevel = filterRequest.minGradeLevel,
+            maxGradeLevel = filterRequest.maxGradeLevel,
+            difficulty    = filterRequest.difficulty,
+            search        = filterRequest.search,
+            pageable      = pageable
         )
 
         val currentUserId = try {

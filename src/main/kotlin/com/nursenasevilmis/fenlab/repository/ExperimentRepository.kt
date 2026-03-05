@@ -34,19 +34,21 @@ interface ExperimentRepository : JpaRepository<Experiment, Long> {
         AND e.isDeleted = false
         AND (:subject IS NULL OR e.subject = :subject)
         AND (:environment IS NULL OR e.environment = :environment)
-        AND (:gradeLevel IS NULL OR e.gradeLevel = :gradeLevel)
         AND (:difficulty IS NULL OR e.difficulty = :difficulty)
+        AND (:minGradeLevel IS NULL OR e.gradeLevel >= :minGradeLevel)
+        AND (:maxGradeLevel IS NULL OR e.gradeLevel <= :maxGradeLevel)
         AND (CAST(:search AS string) IS NULL 
              OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) 
              OR LOWER(e.description) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
              OR LOWER(e.topic) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
     """)
     fun findByFilters(
-        @Param("subject") subject: SubjectType?,
-        @Param("environment") environment: EnvironmentType?,
-        @Param("gradeLevel") gradeLevel: Int?,
-        @Param("difficulty") difficulty: DifficultyLevel?,
-        @Param("search") search: String?,
+        @Param("subject")       subject: SubjectType?,
+        @Param("environment")   environment: EnvironmentType?,
+        @Param("minGradeLevel") minGradeLevel: Int?,
+        @Param("maxGradeLevel") maxGradeLevel: Int?,
+        @Param("difficulty")    difficulty: DifficultyLevel?,
+        @Param("search")        search: String?,
         pageable: Pageable
     ): Page<Experiment>
 
