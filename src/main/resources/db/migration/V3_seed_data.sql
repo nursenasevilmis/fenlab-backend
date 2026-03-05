@@ -93,3 +93,46 @@ INSERT INTO notifications (user_id, type, message, is_read, experiment_id, relat
 (1, 'QUESTION', 'Zeynep Şahin deneyinize soru sordu.', false, 1, 4, CURRENT_TIMESTAMP),
 (1, 'FAVORITE', 'Mehmet Kaya deneyinizi favorilerine ekledi.', false, 1, 3, CURRENT_TIMESTAMP),
 (3, 'ANSWER', 'Ahmet Yılmaz sorunuzu cevapladı.', false, 1, 1, CURRENT_TIMESTAMP);
+
+-- SEQUENCE RESET
+-- Fresh kurulumda ID çakışmalarını önlemek için
+-- ===========================
+SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+SELECT setval('experiments_id_seq', (SELECT MAX(id) FROM experiments));
+SELECT setval('experiment_materials_id_seq', (SELECT MAX(id) FROM experiment_materials));
+SELECT setval('experiment_steps_id_seq', (SELECT MAX(id) FROM experiment_steps));
+SELECT setval('experiment_media_id_seq', (SELECT MAX(id) FROM experiment_media));
+SELECT setval('favorites_id_seq', (SELECT MAX(id) FROM favorites));
+SELECT setval('comments_id_seq', (SELECT MAX(id) FROM comments));
+SELECT setval('questions_id_seq', (SELECT MAX(id) FROM questions));
+SELECT setval('ratings_id_seq', (SELECT MAX(id) FROM ratings));
+SELECT setval('notifications_id_seq', (SELECT MAX(id) FROM notifications));
+SELECT setval('pdf_downloads_id_seq', (SELECT MAX(id) FROM pdf_downloads));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
