@@ -11,4 +11,5 @@ interface UserService {
     fun updateUser(userId: Long, request: UserUpdateRequestDTO): UserResponseDTO
     fun deleteUser(userId: Long)
     fun mapToUserSummary(user: User): UserSummaryResponseDTO
+    fun searchUsers(query: String): List<UserResponseDTO>
 }

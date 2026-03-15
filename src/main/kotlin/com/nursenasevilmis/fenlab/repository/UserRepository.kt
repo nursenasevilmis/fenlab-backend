@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.util.*
 
-
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
 
@@ -28,4 +27,10 @@ interface UserRepository : JpaRepository<User, Long> {
 
     @Query("SELECT COUNT(e) FROM Experiment e WHERE e.user.id = :userId AND e.isDeleted = false")
     fun countExperimentsByUserId(@Param("userId") userId: Long): Long
+
+    // Kullanıcı arama
+    fun findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(
+        username: String,
+        fullName: String
+    ): List<User>
 }

@@ -13,44 +13,37 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "Kullanıcı işlemleri")
-@SecurityRequirement(name = "bearerAuth") // Swagger JWT güvenliği için
+@SecurityRequirement(name = "bearerAuth")
 class UserController(
     private val userService: UserService
 ) {
 
     @GetMapping("/me")
     @Operation(summary = "Giriş yapmış kullanıcının bilgilerini getirir")
-    fun getCurrentUser(): ResponseEntity<UserResponseDTO> {
-        val response = userService.getCurrentUser()
-        return ResponseEntity.ok(response)
-    }
-
+    fun getCurrentUser(): ResponseEntity<UserResponseDTO> =
+        ResponseEntity.ok(userService.getCurrentUser())
 
     @GetMapping("/{userId}")
     @Operation(summary = "Kullanıcı ID'sine göre kullanıcı bilgilerini getirir")
-    fun getUserById(
-        @PathVariable userId: Long
-    ): ResponseEntity<UserResponseDTO> {
-        val response = userService.getUserById(userId)
-        return ResponseEntity.ok(response)
-    }
+    fun getUserById(@PathVariable userId: Long): ResponseEntity<UserResponseDTO> =
+        ResponseEntity.ok(userService.getUserById(userId))
+
+    @GetMapping("/search")
+    @Operation(summary = "Kullanıcı adı veya isimle kullanıcı arar")
+    fun searchUsers(@RequestParam q: String): ResponseEntity<List<UserResponseDTO>> =
+        ResponseEntity.ok(userService.searchUsers(q))
 
     @PutMapping("/{userId}")
     @Operation(summary = "Giriş yapmış kullanıcı kendi profil bilgilerini günceller")
     fun updateUser(
         @PathVariable userId: Long,
         @RequestBody request: UserUpdateRequestDTO
-    ): ResponseEntity<UserResponseDTO> {
-        val response = userService.updateUser(userId, request)
-        return ResponseEntity.ok(response)
-    }
-
+    ): ResponseEntity<UserResponseDTO> =
+        ResponseEntity.ok(userService.updateUser(userId, request))
 
     @DeleteMapping("/{userId}")
     @Operation(summary = "Kullanıcı kendi hesabını siler (soft delete)")
-    fun deleteUser(
-        @PathVariable userId: Long
-    ): ResponseEntity<String> {
+    fun deleteUser(@PathVariable userId: Long): ResponseEntity<String> {
         userService.deleteUser(userId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }

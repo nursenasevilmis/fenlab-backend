@@ -9,12 +9,8 @@ import com.nursenasevilmis.fenlab.mapper.UserMapper
 import com.nursenasevilmis.fenlab.model.User
 import com.nursenasevilmis.fenlab.repository.ExperimentRepository
 import com.nursenasevilmis.fenlab.repository.UserRepository
-import com.nursenasevilmis.fenlab.security.UserPrincipal
 import com.nursenasevilmis.fenlab.service.UserService
 import com.nursenasevilmis.fenlab.util.SecurityUtils
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,7 +24,6 @@ class UserServiceImpl(
     override fun getUserById(userId: Long): UserResponseDTO {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı: $userId") }
-
         val experimentCount = experimentRepository.countByUserId(userId)
         return userMapper.toUserResponse(user, experimentCount)
     }
@@ -41,43 +36,46 @@ class UserServiceImpl(
     @Transactional
     override fun updateUser(userId: Long, request: UserUpdateRequestDTO): UserResponseDTO {
         val currentUserId = SecurityUtils.getCurrentUserId()
-        if (currentUserId != userId) {
-            throw ForbiddenException("Sadece kendi profilinizi güncelleyebilirsiniz")
-        }
+        if (currentUserId != userId) throw ForbiddenException("Sadece kendi profilinizi güncelleyebilirsiniz")
 
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı: $userId") }
 
         val updatedUser = user.copy(
-            fullName = request.fullName ?: user.fullName,
-            email = request.email ?: user.email,
-            branch = request.branch ?: user.branch,
+            fullName        = request.fullName ?: user.fullName,
+            email           = request.email ?: user.email,
+            branch          = request.branch ?: user.branch,
             experienceYears = request.experienceYears ?: user.experienceYears,
-            bio = request.bio ?: user.bio,
+            bio             = request.bio ?: user.bio,
             profileImageUrl = request.profileImageUrl ?: user.profileImageUrl
         )
 
         val savedUser = userRepository.save(updatedUser)
         val experimentCount = experimentRepository.countByUserId(userId)
-
         return userMapper.toUserResponse(savedUser, experimentCount)
     }
 
     @Transactional
     override fun deleteUser(userId: Long) {
         val currentUserId = SecurityUtils.getCurrentUserId()
-        if (currentUserId != userId) {
-            throw ForbiddenException("Sadece kendi hesabınızı silebilirsiniz")
-        }
+        if (currentUserId != userId) throw ForbiddenException("Sadece kendi hesabınızı silebilirsiniz")
 
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı: $userId") }
 
-        val deletedUser = user.copy(isDeleted = true)
-        userRepository.save(deletedUser)
+        userRepository.save(user.copy(isDeleted = true))
     }
 
-    override fun mapToUserSummary(user: com.nursenasevilmis.fenlab.model.User): UserSummaryResponseDTO {
+    override fun mapToUserSummary(user: User): UserSummaryResponseDTO {
         return userMapper.toUserSummary(user)
+    }
+
+    override fun searchUsers(query: String): List<UserResponseDTO> {
+        val users = userRepository.findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(query, query)
+        return users.map { user ->
+            val uid = user.id ?: return@map userMapper.toUserResponse(user, 0L)
+            val experimentCount = experimentRepository.countByUserId(uid)
+            userMapper.toUserResponse(user, experimentCount)
+        }
     }
 }
