@@ -160,6 +160,22 @@ class GlobalExceptionHandler {
         return ResponseEntity(errorResponse, HttpStatus.PAYLOAD_TOO_LARGE)
     }
 
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(
+        ex: IllegalStateException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponseDTO> {
+        // SecurityUtils.getCurrentUserId() throws this when token is missing/expired
+        val errorResponse = ErrorResponseDTO(
+            timestamp = LocalDateTime.now(),
+            status    = HttpStatus.UNAUTHORIZED.value(),
+            error     = "Unauthorized",
+            message   = "Oturum süreniz doldu. Lütfen tekrar giriş yapın.",
+            path      = request.getDescription(false).replace("uri=", "")
+        )
+        return ResponseEntity(errorResponse, HttpStatus.UNAUTHORIZED)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(
         ex: Exception,
