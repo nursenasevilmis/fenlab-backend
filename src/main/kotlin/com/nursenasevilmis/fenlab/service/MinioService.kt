@@ -158,8 +158,8 @@ class MinioService(
     }*/
     fun getFileUrl(bucketName: String, fileName: String): String {
         val androidUrl = minioProperties.url
-            .replace("localhost", "192.168.1.108")
-            .replace("127.0.0.1", "192.168.1.108")
+            .replace("localhost", "172.20.10.3")
+            .replace("192.168.1.108", "172.20.10.3")
         return "$androidUrl/$bucketName/$fileName"
     }
 
