@@ -41,7 +41,7 @@ class SecurityConfig(
             }
 
         // JWT Filter'ı devre dışı bırakmak için yorum satırına alındı
-        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
