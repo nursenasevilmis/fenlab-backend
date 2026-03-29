@@ -12,6 +12,8 @@ interface NotificationService {
     fun markAsRead(notificationId: Long)
     fun markAllAsRead()
     fun getUnreadCount(): Long
+    fun deleteNotification(notificationId: Long)
+    fun deleteAllNotifications()
     fun createCommentNotification(experiment: Experiment, commenter: User)
     fun createQuestionNotification(experiment: Experiment, asker: User)
     fun createAnswerNotification(question: Question, answerer: User)

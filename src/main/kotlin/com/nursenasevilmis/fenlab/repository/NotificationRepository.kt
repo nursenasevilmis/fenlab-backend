@@ -25,4 +25,8 @@ interface NotificationRepository : JpaRepository<Notification, Long> {
 
     fun deleteByType(type: NotificationType)
 
+    @Modifying
+    @Query("DELETE FROM Notification n WHERE n.user.id = :userId")
+    fun deleteAllByUserId(@Param("userId") userId: Long)
+
 }

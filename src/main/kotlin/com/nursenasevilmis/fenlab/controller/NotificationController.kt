@@ -58,4 +58,20 @@ class NotificationController(
         val count = notificationService.getUnreadCount()
         return ResponseEntity.ok(mapOf("unreadCount" to count))
     }
+
+    @Operation(summary = "Belirli bir bildirimi sil")
+    @DeleteMapping("/{notificationId}")
+    fun deleteNotification(
+        @PathVariable notificationId: Long
+    ): ResponseEntity<Map<String, String>> {
+        notificationService.deleteNotification(notificationId)
+        return ResponseEntity.ok(mapOf("message" to "Bildirim silindi."))
+    }
+
+    @Operation(summary = "Tüm bildirimleri sil")
+    @DeleteMapping
+    fun deleteAllNotifications(): ResponseEntity<Map<String, String>> {
+        notificationService.deleteAllNotifications()
+        return ResponseEntity.ok(mapOf("message" to "Tüm bildirimler silindi."))
+    }
 }

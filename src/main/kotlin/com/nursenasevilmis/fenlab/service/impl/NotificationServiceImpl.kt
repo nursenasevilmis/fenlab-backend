@@ -86,6 +86,26 @@ class NotificationServiceImpl(
         return notificationRepository.countByUserIdAndIsReadFalse(currentUserId)
     }
 
+    @Transactional
+    override fun deleteNotification(notificationId: Long) {
+        val currentUserId = SecurityUtils.getCurrentUserId()
+
+        val notification = notificationRepository.findById(notificationId)
+            .orElseThrow { ResourceNotFoundException("Bildirim bulunamadı: $notificationId") }
+
+        if (notification.user.id != currentUserId) {
+            throw ForbiddenException("Bu bildirimi silme yetkiniz yok")
+        }
+
+        notificationRepository.deleteById(notificationId)
+    }
+
+    @Transactional
+    override fun deleteAllNotifications() {
+        val currentUserId = SecurityUtils.getCurrentUserId()
+        notificationRepository.deleteAllByUserId(currentUserId)
+    }
+
     // --- Bildirim oluşturma metodları ---
     @Transactional
     override fun createCommentNotification(experiment: Experiment, commenter: User) {
