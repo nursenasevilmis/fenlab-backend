@@ -36,7 +36,6 @@ class MinioService(
                         .bucket(bucketName)
                         .build()
                 )
-                // Bucket'ı public read yapmak isterseniz policy ekleyin
                 setBucketPolicy(bucketName)
             }
         }
@@ -66,7 +65,7 @@ class MinioService(
     }
 
     /**
-     * Video yükleme
+     * Video yükleme — DB'ye "fenlab-videos/dosya.mp4" şeklinde path döner
      */
     fun uploadVideo(file: MultipartFile): String {
         val fileName = generateFileName(file.originalFilename ?: "video", "mp4")
@@ -79,7 +78,7 @@ class MinioService(
     }
 
     /**
-     * Resim yükleme
+     * Resim yükleme — DB'ye "fenlab-images/dosya.jpg" şeklinde path döner
      */
     fun uploadImage(file: MultipartFile): String {
         val fileName = generateFileName(file.originalFilename ?: "image", "jpg")
@@ -92,7 +91,7 @@ class MinioService(
     }
 
     /**
-     * Profil resmi yükleme
+     * Profil resmi yükleme — DB'ye "fenlab-profiles/dosya.jpg" şeklinde path döner
      */
     fun uploadProfileImage(file: MultipartFile): String {
         val fileName = generateFileName(file.originalFilename ?: "profile", "jpg")
@@ -105,7 +104,7 @@ class MinioService(
     }
 
     /**
-     * PDF yükleme
+     * PDF yükleme — DB'ye "fenlab-pdfs/dosya.pdf" şeklinde path döner
      */
     fun uploadPdf(inputStream: InputStream, fileName: String): String {
         val pdfFileName = generateFileName(fileName, "pdf")
@@ -118,7 +117,7 @@ class MinioService(
     }
 
     /**
-     * Genel dosya yükleme
+     * Genel dosya yükleme — artık tam URL değil, sadece path döner
      */
     private fun uploadFile(
         inputStream: InputStream,
@@ -135,32 +134,28 @@ class MinioService(
                     .contentType(contentType)
                     .build()
             )
-            return getFileUrl(bucketName, fileName)
+            // Tam URL değil, sadece path kaydediliyor → IP değişince DB bozulmaz
+            return getObjectPath(bucketName, fileName)
         } catch (e: Exception) {
             throw RuntimeException("Dosya yüklenirken hata oluştu: ${e.message}", e)
         }
     }
 
     /**
-     * Dosya URL'i alma
+     * DB'ye kaydedilen path'den tam URL üretir.
+     * IP sadece application.properties'deki minio.public-url'den okunur.
      */
-    /*
-    fun getFileUrl(bucketName: String, fileName: String): String {
-        return "${minioProperties.url}/$bucketName/$fileName"
+    fun pathToUrl(objectPath: String): String {
+        val baseUrl = minioProperties.publicUrl.ifBlank { minioProperties.url }
+        return "$baseUrl/$objectPath"
     }
-*/
 
-   /* fun getFileUrl(bucketName: String, fileName: String): String {
-        val androidUrl = minioProperties.url
-            .replace("localhost", "10.0.3.2")
-            .replace("127.0.0.1", "10.0.3.2")
-        return "$androidUrl/$bucketName/$fileName"
-    }*/
-    fun getFileUrl(bucketName: String, fileName: String): String {
-        val androidUrl = minioProperties.url
-            .replace("localhost", "172.20.10.3")
-            .replace("192.168.1.108", "172.20.10.3")
-        return "$androidUrl/$bucketName/$fileName"
+    /**
+     * Sadece path döner: "fenlab-profiles/foto.jpg"
+     * Bunu doğrudan DB'ye kaydet.
+     */
+    fun getObjectPath(bucketName: String, fileName: String): String {
+        return "$bucketName/$fileName"
     }
 
     /**
@@ -178,10 +173,16 @@ class MinioService(
     }
 
     /**
-     * Dosya silme
+     * Dosya silme — path veya tam URL ile çalışır
      */
-    fun deleteFile(bucketName: String, fileName: String) {
+    fun deleteFile(bucketName: String, objectPath: String) {
         try {
+            // Path "fenlab-profiles/foto.jpg" veya sadece "foto.jpg" olabilir
+            val fileName = if (objectPath.contains("/")) {
+                objectPath.substringAfterLast("/")
+            } else {
+                objectPath
+            }
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
                     .bucket(bucketName)
@@ -194,18 +195,18 @@ class MinioService(
     }
 
     /**
-     * Video silme
+     * Video silme — DB'deki path veya eski tam URL ile çalışır
      */
-    fun deleteVideo(videoUrl: String) {
-        val fileName = extractFileNameFromUrl(videoUrl)
+    fun deleteVideo(videoPath: String) {
+        val fileName = videoPath.substringAfterLast("/")
         deleteFile(minioProperties.buckets.videos, fileName)
     }
 
     /**
-     * Resim silme
+     * Resim silme — DB'deki path veya eski tam URL ile çalışır
      */
-    fun deleteImage(imageUrl: String) {
-        val fileName = extractFileNameFromUrl(imageUrl)
+    fun deleteImage(imagePath: String) {
+        val fileName = imagePath.substringAfterLast("/")
         deleteFile(minioProperties.buckets.images, fileName)
     }
 
@@ -221,19 +222,9 @@ class MinioService(
         )
     }
 
-    /**
-     * Benzersiz dosya adı oluşturma
-     */
     private fun generateFileName(originalFileName: String, extension: String): String {
         val uuid = UUID.randomUUID().toString()
         val timestamp = System.currentTimeMillis()
         return "${timestamp}_${uuid}.$extension"
-    }
-
-    /**
-     * URL'den dosya adını çıkarma
-     */
-    private fun extractFileNameFromUrl(url: String): String {
-        return url.substringAfterLast("/")
     }
 }

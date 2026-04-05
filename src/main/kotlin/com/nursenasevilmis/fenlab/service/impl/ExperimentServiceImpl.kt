@@ -11,6 +11,8 @@ import com.nursenasevilmis.fenlab.repository.*
 import com.nursenasevilmis.fenlab.service.ExperimentService
 import com.nursenasevilmis.fenlab.util.PaginationUtils
 import com.nursenasevilmis.fenlab.util.SecurityUtils
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -25,6 +27,10 @@ class ExperimentServiceImpl(
     private val userRepository: UserRepository,
     private val experimentMapper: ExperimentMapper
 ) : ExperimentService {
+
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
+
 
     override fun getAllExperiments(filterRequest: ExperimentFilterRequestDTO): PaginatedResponseDTO<ExperimentSummaryResponseDTO> {
         val sort = when (filterRequest.sortType) {
@@ -93,7 +99,7 @@ class ExperimentServiceImpl(
 
     @Transactional
     override fun createExperiment(request: ExperimentCreateRequestDTO): ExperimentResponseDTO {
-        val currentUserId = 2L // SecurityUtils.getCurrentUserId()
+        val currentUserId = SecurityUtils.getCurrentUserId()
         val user = userRepository.findById(currentUserId)
             .orElseThrow { ResourceNotFoundException("Kullanıcı bulunamadı") }
 
@@ -156,7 +162,7 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-        val currentUserId = 2L // SecurityUtils.getCurrentUserId()
+        val currentUserId = SecurityUtils.getCurrentUserId()
 
         val updatedExperiment = experiment.copy(
             title = request.title ?: experiment.title,
@@ -176,6 +182,7 @@ class ExperimentServiceImpl(
 
         request.materials?.let {
             experimentMaterialRepository.deleteByExperimentId(experimentId)
+            experimentMaterialRepository.flush()   // ← DELETE önce commit edilsin
             it.forEach { req ->
                 experimentMaterialRepository.save(
                     ExperimentMaterial(
@@ -189,6 +196,7 @@ class ExperimentServiceImpl(
 
         request.steps?.let {
             experimentStepRepository.deleteByExperimentId(experimentId)
+            experimentStepRepository.flush()   // ← DELETE DB'ye yazılsın, unique constraint çakışmasın
             it.forEach { req ->
                 experimentStepRepository.save(
                     ExperimentStep(
@@ -202,6 +210,7 @@ class ExperimentServiceImpl(
 
         request.media?.let {
             experimentMediaRepository.deleteByExperimentId(experimentId)
+            experimentMediaRepository.flush()   // ← DELETE önce commit edilsin
             it.forEach { req ->
                 experimentMediaRepository.save(
                     ExperimentMedia(
@@ -222,7 +231,7 @@ class ExperimentServiceImpl(
         val experiment = experimentRepository.findById(experimentId)
             .orElseThrow { ResourceNotFoundException("Deney bulunamadı: $experimentId") }
 
-        val currentUserId = 2L
+        val currentUserId = SecurityUtils.getCurrentUserId()
         val deletedExperiment = experiment.copy(isDeleted = true)
         experimentRepository.save(deletedExperiment)
     }

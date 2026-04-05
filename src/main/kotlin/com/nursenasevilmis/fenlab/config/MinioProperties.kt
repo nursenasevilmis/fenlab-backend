@@ -9,6 +9,7 @@ data class MinioProperties(
     var url: String = "",
     var accessKey: String = "",
     var secretKey: String = "",
+    var publicUrl: String = "",
     var buckets: Buckets = Buckets()
 ) {
     data class Buckets(
